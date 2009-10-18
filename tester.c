@@ -1,6 +1,4 @@
 #include "owl.h"
-#include <unistd.h>
-#include <stdlib.h>
 
 owl_global g;
 

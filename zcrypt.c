@@ -9,9 +9,6 @@
  *   "crypt-default" for the keyfile name.                                   */
 
 #include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <sys/types.h>
 #include <sys/wait.h>
 #include "owl.h"
 
@@ -20,8 +17,6 @@
 #define BASE_CODE 70
 #define LAST_CODE (BASE_CODE + 15)
 #define OUTPUT_BLOCK_SIZE 16
-#include <unistd.h>
-#include <sys/types.h>
 
 #ifdef HAVE_KERBEROS_IV
 #include <kerberosIV/des.h>
@@ -293,4 +288,4 @@ char *GetZephyrVarKeyFile(const char *whoami, const char *class, const char *ins
   return(keyfile);
 }
 
-#endif
+#endif /* OWL_ENABLE_ZCRYPT */

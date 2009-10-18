@@ -1,8 +1,4 @@
 #include "owl.h"
-#include <stdlib.h>
-#include <string.h>
-#include <ctype.h>
-#include <sys/param.h>
 
 /* This is now the one function that should be called to log a
  * message.  It will do all the work necessary by calling the other
@@ -81,6 +77,7 @@ void owl_log_zephyr(const owl_message *m, FILE *file) {
     owl_free(tmp);
 }
 
+#if 0
 void owl_log_aim(const owl_message *m, FILE *file) {
     fprintf(file, "From: <%s> To: <%s>\n", owl_message_get_sender(m), owl_message_get_recipient(m));
     fprintf(file, "Time: %s\n\n", owl_message_get_timestr(m));
@@ -91,6 +88,7 @@ void owl_log_aim(const owl_message *m, FILE *file) {
     else
         fprintf(file, "%s\n\n", owl_message_get_body(m));
 }
+#endif
 
 void owl_log_jabber(const owl_message *m, FILE *file) {
     fprintf(file, "From: <%s> To: <%s>\n",owl_message_get_sender(m), owl_message_get_recipient(m));
@@ -115,8 +113,10 @@ void owl_log_append(const owl_message *m, const char *filename) {
         owl_log_zephyr(m, file);
     } else if (owl_message_is_type_jabber(m)) {
         owl_log_jabber(m, file);
+#if 0
     } else if (owl_message_is_type_aim(m)) {
-        owl_log_aim(m, file);
+      owl_log_aim(m, file);
+#endif
     } else {
         owl_log_generic(m, file);
     }
@@ -149,6 +149,7 @@ void owl_log_outgoing(const owl_message *m)
   } else if (owl_message_is_type_jabber(m)) {
     to = owl_sprintf("jabber:%s", owl_message_get_recipient(m));
     owl_text_tr(to, '/', '_');
+#if 0
   } else if (owl_message_is_type_aim(m)) {
     char *temp2;
     temp = owl_aim_normalize_screenname(owl_message_get_recipient(m));
@@ -156,6 +157,7 @@ void owl_log_outgoing(const owl_message *m)
     to = owl_sprintf("aim:%s", temp2);
     owl_free(temp2);
     owl_free(temp);
+#endif
   } else {
     to = owl_sprintf("loopback");
   }
@@ -262,6 +264,7 @@ void owl_log_incoming(const owl_message *m)
     } else {
       from=frombuff=owl_strdup(owl_message_get_class(m));
     }
+#if 0
   } else if (owl_message_is_type_aim(m)) {
     /* we do not yet handle chat rooms */
     char *normalto, *temp;
@@ -270,6 +273,7 @@ void owl_log_incoming(const owl_message *m)
     from=frombuff=owl_sprintf("aim:%s", normalto);
     owl_free(normalto);
     owl_free(temp);
+#endif
   } else if (owl_message_is_type_loopback(m)) {
     from=frombuff=owl_strdup("loopback");
   } else if (owl_message_is_type_jabber(m)) {

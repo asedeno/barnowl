@@ -1,11 +1,5 @@
 #include <stdio.h>
-#include <unistd.h>
-#include <stdlib.h>
-#include <string.h>
-#include <netdb.h>
-#include <termios.h>
 #include <sys/ioctl.h>
-#include <time.h>
 #include "owl.h"
 
 #ifndef MAXHOSTNAMELEN
@@ -95,20 +89,10 @@ void owl_global_init(owl_global *g) {
   owl_mainwin_init(&(g->mw));
   owl_popwin_init(&(g->pw));
 
-  g->aim_screenname=NULL;
-  g->aim_screenname_for_filters=NULL;
-  g->aim_loggedin=0;
-  owl_buddylist_init(&(g->buddylist));
-
   g->havezephyr=0;
-  g->haveaim=0;
-  g->ignoreaimlogin=0;
-  owl_global_set_no_doaimevents(g);
 
   owl_errqueue_init(&(g->errqueue));
   g->got_err_signal=0;
-
-  owl_zbuddylist_create(&(g->zbuddies));
 
   owl_obarray_init(&(g->obarray));
 
@@ -758,80 +742,6 @@ pid_t owl_global_get_newmsgproc_pid(const owl_global *g) {
   return(g->newmsgproc_pid);
 }
 
-/* AIM stuff */
-
-int owl_global_is_aimloggedin(const owl_global *g)
-{
-  if (g->aim_loggedin) return(1);
-  return(0);
-}
-
-const char *owl_global_get_aim_screenname(const owl_global *g)
-{
-  if (owl_global_is_aimloggedin(g)) {
-    return (g->aim_screenname);
-  }
-  return("");
-}
-
-const char *owl_global_get_aim_screenname_for_filters(const owl_global *g)
-{
-  if (owl_global_is_aimloggedin(g)) {
-    return (g->aim_screenname_for_filters);
-  }
-  return("");
-}
-
-void owl_global_set_aimloggedin(owl_global *g, const char *screenname)
-{
-  char *sn_escaped;
-  const char *quote;
-  g->aim_loggedin=1;
-  if (g->aim_screenname) owl_free(g->aim_screenname);
-  if (g->aim_screenname_for_filters) owl_free(g->aim_screenname_for_filters);
-  g->aim_screenname=owl_strdup(screenname);
-  sn_escaped = owl_text_quote(screenname, OWL_REGEX_QUOTECHARS, OWL_REGEX_QUOTEWITH);
-  quote = owl_getquoting(sn_escaped);
-  g->aim_screenname_for_filters=owl_sprintf("%s%s%s", quote, sn_escaped, quote);
-  owl_free(sn_escaped);
-}
-
-void owl_global_set_aimnologgedin(owl_global *g)
-{
-  g->aim_loggedin=0;
-}
-
-int owl_global_is_doaimevents(const owl_global *g)
-{
-  if (g->aim_doprocessing) return(1);
-  return(0);
-}
-
-void owl_global_set_doaimevents(owl_global *g)
-{
-  g->aim_doprocessing=1;
-}
-
-void owl_global_set_no_doaimevents(owl_global *g)
-{
-  g->aim_doprocessing=0;
-}
-
-aim_session_t *owl_global_get_aimsess(owl_global *g)
-{
-  return(&(g->aimsess));
-}
-
-aim_conn_t *owl_global_get_bosconn(owl_global *g)
-{
-  return(&(g->bosconn));
-}
-
-void owl_global_set_bossconn(owl_global *g, aim_conn_t *conn)
-{
-  g->bosconn=*conn;
-}
-
 /* message queue */
 
 void owl_global_messagequeue_addmsg(owl_global *g, owl_message *m)
@@ -859,11 +769,6 @@ int owl_global_messagequeue_pending(owl_global *g)
   return(1);
 }
 
-owl_buddylist *owl_global_get_buddylist(owl_global *g)
-{
-  return(&(g->buddylist));
-}
-  
 /* style */
 
 /* Return the style with name 'name'.  If it does not exist return
@@ -891,32 +796,6 @@ void owl_global_add_style(owl_global *g, owl_style *s)
     g->current_view.style = s;
   owl_dict_insert_element(&(g->styledict), owl_style_get_name(s),
                           s, (void(*)(void*))owl_style_free);
-}
-
-void owl_global_set_haveaim(owl_global *g)
-{
-  g->haveaim=1;
-}
-
-int owl_global_is_haveaim(const owl_global *g)
-{
-  if (g->haveaim) return(1);
-  return(0);
-}
-
-void owl_global_set_ignore_aimlogin(owl_global *g)
-{
-    g->ignoreaimlogin = 1;
-}
-
-void owl_global_unset_ignore_aimlogin(owl_global *g)
-{
-    g->ignoreaimlogin = 0;
-}
-
-int owl_global_is_ignore_aimlogin(const owl_global *g)
-{
-    return g->ignoreaimlogin;
 }
 
 void owl_global_set_havezephyr(owl_global *g)

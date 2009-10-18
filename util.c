@@ -1,11 +1,7 @@
 #include "owl.h"
-#include <stdlib.h>
-#include <string.h>
-#include <unistd.h>
 #include <ctype.h>
 #include <pwd.h>
 #include <sys/stat.h>
-#include <sys/types.h>
 
 void sepbar(const char *in)
 {
@@ -73,18 +69,12 @@ void sepbar(const char *in)
     wprintw(sepwin, " right: %i ", owl_global_get_rightshift(&g));
   }
 
-  if (owl_global_is_zaway(&g) || owl_global_is_aaway(&g)) {
+  if (owl_global_is_zaway(&g)) {
     getyx(sepwin, y, x);
     wmove(sepwin, y, x+2);
     wattron(sepwin, A_BOLD);
     wattroff(sepwin, A_REVERSE);
-    if (owl_global_is_zaway(&g) && owl_global_is_aaway(&g)) {
-      waddstr(sepwin, " AWAY ");
-    } else if (owl_global_is_zaway(&g)) {
-      waddstr(sepwin, " Z-AWAY ");
-    } else if (owl_global_is_aaway(&g)) {
-      waddstr(sepwin, " A-AWAY ");
-    }
+    waddstr(sepwin, " Z-AWAY ");
     wattron(sepwin, A_REVERSE);
     wattroff(sepwin, A_BOLD);
   }

@@ -1,7 +1,4 @@
 #include <stdio.h>
-#include <string.h>
-#include <stdlib.h>
-#include <ctype.h>
 #include "owl.h"
 
 void owl_text_indent(char *out, const char *in, int n)

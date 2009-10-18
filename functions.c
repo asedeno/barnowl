@@ -1,15 +1,7 @@
 #include <stdio.h>
-#include <stdlib.h>
-#include <unistd.h>
-#include <signal.h>
 #include <netinet/in.h>
-#include <string.h>
-#include <time.h>
-#include <sys/types.h>
 #include <sys/stat.h>
 #include <sys/wait.h>
-#include <errno.h>
-#include <signal.h>
 #include "owl.h"
 
 char *owl_function_command(const char *cmdbuff)
@@ -176,9 +168,6 @@ void owl_function_show_quickstart(void)
     "press 'z' and then type the username. To subscribe to a class, type\n"
     "':sub @b(class)', and then type ':zwrite -c @b(class)' to send.\n\n"
 #endif
-    "@b(AIM:)\n"
-    "Log in to AIM with ':aimlogin @b(screenname)'. Use ':aimwrite @b(screenname)',\n"
-    "or 'a' and then the screen name, to send someone a message.\n\n"
     ;
 
     if (owl_perlconfig_is_function("BarnOwl::Hooks::_get_quickstart")) {
@@ -239,28 +228,6 @@ owl_message *owl_function_make_outgoing_zephyr(const char *body, const char *zwr
   owl_message_create_from_zwrite(m, &zw, body);
   owl_zwrite_free(&zw);
 
-  return(m);
-}
-
-/* Create an outgoing AIM message, returns a pointer to the created
- * message or NULL if we're not logged into AIM (and thus unable to
- * create the message).  Does not put it on the global queue.  Use
- * owl_global_messagequeue_addmsg() for that .
- */
-owl_message *owl_function_make_outgoing_aim(const char *body, const char *to)
-{
-  owl_message *m;
-
-  /* error if we're not logged into aim */
-  if (!owl_global_is_aimloggedin(&g)) return(NULL);
-  
-  m=owl_malloc(sizeof(owl_message));
-  owl_message_create_aim(m,
-			 owl_global_get_aim_screenname(&g),
-			 to,
-			 body,
-			 OWL_MESSAGE_DIRECTION_OUT,
-			 0);
   return(m);
 }
 
@@ -339,11 +306,6 @@ void owl_function_zwrite_setup(const char *line)
   owl_zwrite_free(&z);
 
   owl_function_write_setup(line, "zephyr", &owl_callback_zwrite);
-}
-
-void owl_function_aimwrite_setup(const char *line)
-{
-  owl_function_write_setup(line, "message", &owl_callback_aimwrite);
 }
 
 void owl_function_loopwrite_setup(void)
@@ -447,72 +409,6 @@ void owl_function_zcrypt(const char *line, const char *msg)
   /* free the zwrite */
   owl_free(cryptmsg);
   owl_zwrite_free(&z);
-}
-
-void owl_callback_aimwrite(owl_editwin *e) {
-  owl_function_aimwrite(owl_editwin_get_command(e),
-                        owl_editwin_get_text(e));
-}
-
-void owl_function_aimwrite(const char *line, const char *msg)
-{
-  int ret;
-  const char *to;
-  char *format_msg;
-  owl_message *m;
-
-  to = line + 9;
-
-  /* make a formatted copy of the message */
-  format_msg=owl_strdup(msg);
-  owl_text_wordunwrap(format_msg);
-  
-  /* send the message */
-  ret=owl_aim_send_im(to, format_msg);
-  if (!ret) {
-    owl_function_makemsg("AIM message sent.");
-  } else {
-    owl_function_error("Could not send AIM message.");
-  }
-
-  /* create the outgoing message */
-  m=owl_function_make_outgoing_aim(msg, to);
-
-  if (m) {
-    owl_global_messagequeue_addmsg(&g, m);
-  } else {
-    owl_function_error("Could not create outgoing AIM message");
-  }
-
-  owl_free(format_msg);
-}
-
-void owl_function_send_aimawymsg(const char *to, const char *msg)
-{
-  int ret;
-  char *format_msg;
-  owl_message *m;
-
-  /* make a formatted copy of the message */
-  format_msg=owl_strdup(msg);
-  owl_text_wordunwrap(format_msg);
-  
-  /* send the message */
-  ret=owl_aim_send_awaymsg(to, format_msg);
-  if (!ret) {
-    /* owl_function_makemsg("AIM message sent."); */
-  } else {
-    owl_function_error("Could not send AIM message.");
-  }
-
-  /* create the message */
-  m=owl_function_make_outgoing_aim(msg, to);
-  if (m) {
-    owl_global_messagequeue_addmsg(&g, m);
-  } else {
-    owl_function_error("Could not create AIM message");
-  }
-  owl_free(format_msg);
 }
 
 void owl_callback_loopwrite(owl_editwin *e) {
@@ -884,22 +780,6 @@ void owl_function_loadloginsubs(const char *file)
   }
 }
 
-void owl_callback_aimlogin(owl_editwin *e) {
-  owl_function_aimlogin(owl_editwin_get_command(e),
-                        owl_editwin_get_text(e));
-}
-
-void owl_function_aimlogin(const char *user, const char *passwd) {
-  int ret;
-
-  /* clear the buddylist */
-  owl_buddylist_clear(owl_global_get_buddylist(&g));
-
-  /* try to login */
-  ret=owl_aim_login(user, passwd);
-  if (ret) owl_function_makemsg("Warning: login for %s failed.\n", user);
-}
-
 void owl_function_suspend(void)
 {
   endwin();
@@ -932,30 +812,6 @@ void owl_function_zaway_off(void)
   owl_function_makemsg("zaway off");
 }
 
-void owl_function_aaway_toggle(void)
-{
-  if (!owl_global_is_aaway(&g)) {
-    owl_global_set_aaway_msg(&g, owl_global_get_aaway_msg_default(&g));
-    owl_function_aaway_on();
-  } else {
-    owl_function_aaway_off();
-  }
-}
-
-void owl_function_aaway_on(void)
-{
-  owl_global_set_aaway_on(&g);
-  /* owl_aim_set_awaymsg(owl_global_get_zaway_msg(&g)); */
-  owl_function_makemsg("AIM away set (%s)", owl_global_get_aaway_msg(&g));
-}
-
-void owl_function_aaway_off(void)
-{
-  owl_global_set_aaway_off(&g);
-  /* owl_aim_set_awaymsg(""); */
-  owl_function_makemsg("AIM away off");
-}
-
 void owl_function_quit(void)
 {
   char *ret;
@@ -978,11 +834,6 @@ void owl_function_quit(void)
   /* Quit zephyr */
   owl_zephyr_shutdown();
   
-  /* Quit AIM */
-  if (owl_global_is_aimloggedin(&g)) {
-    owl_aim_logout();
-  }
-
   /* done with curses */
   endwin();
 
@@ -1778,7 +1629,6 @@ void owl_function_status(void)
   } else {
     owl_fmtext_append_normal(&fm, "no\n");
   }
-  owl_fmtext_append_normal(&fm, "  AIM included       : yes\n");
   owl_fmtext_append_normal(&fm, "  Loopback included  : yes\n");
 
 
@@ -1790,22 +1640,6 @@ void owl_function_status(void)
   owl_fmtext_append_normal(&fm, "no\n");
 #endif
   
-
-  owl_fmtext_append_normal(&fm, "\nAIM Status:\n");
-  owl_fmtext_append_normal(&fm, "  Logged in: ");
-  if (owl_global_is_aimloggedin(&g)) {
-    owl_fmtext_append_normal(&fm, owl_global_get_aim_screenname(&g));
-    owl_fmtext_append_normal(&fm, "\n");
-  } else {
-    owl_fmtext_append_normal(&fm, "(not logged in)\n");
-  }
-
-  owl_fmtext_append_normal(&fm, "  Processing events: ");
-  if (owl_global_is_doaimevents(&g)) {
-    owl_fmtext_append_normal(&fm, "yes\n");
-  } else {
-    owl_fmtext_append_normal(&fm, "no\n");
-  }
 
   owl_function_popless_fmtext(&fm);
   owl_fmtext_free(&fm);
@@ -2401,46 +2235,6 @@ char *owl_function_zuserfilt(const char *user)
   return(filtname);
 }
 
-/* Create a filter for AIM IM messages to or from the specified
- * screenname.  The name of the filter will be 'aimuser-<user>'.  If a
- * filter already exists with this name, no new filter will be
- * created.  This allows the configuration to override this function.
- * Returns the name of the filter, which the caller must free.
- */
-char *owl_function_aimuserfilt(const char *user)
-{
-  owl_filter *f;
-  char *argbuff, *filtname;
-  char *escuser;
-
-  /* name for the filter */
-  filtname=owl_sprintf("aimuser-%s", user);
-
-  /* if it already exists then go with it.  This lets users override */
-  if (owl_global_get_filter(&g, filtname)) {
-    return(owl_strdup(filtname));
-  }
-
-  /* create the new-internal filter */
-  escuser = owl_text_quote(user, OWL_REGEX_QUOTECHARS, OWL_REGEX_QUOTEWITH);
-
-  argbuff = owl_sprintf(
-      "( type ^aim$ and ( ( sender ^%1$s$ and recipient ^%2$s$ ) or "
-      "( sender ^%2$s$ and recipient ^%1$s$ ) ) )",
-      escuser, owl_global_get_aim_screenname_for_filters(&g));
-
-  f = owl_filter_new_fromstring(filtname, argbuff);
-
-  /* add it to the global list */
-  owl_global_add_filter(&g, f);
-
-  /* free stuff */
-  owl_free(argbuff);
-  owl_free(escuser);
-
-  return(filtname);
-}
-
 char *owl_function_typefilt(const char *type)
 {
   owl_filter *f;
@@ -2506,8 +2300,6 @@ void owl_function_delete_curview_msgs(int flag)
  *    return a filter name for just the class.
  * If the curmsg is a zephyr class message and type==1 then 
  *    return a filter name for the class and instance.
- * If the curmsg is a personal AIM message returna  filter
- *    name to the AIM conversation with that user 
  */
 char *owl_function_smartfilter(int type)
 {
@@ -2532,16 +2324,6 @@ char *owl_function_smartfilter(int type)
   /* very simple handling of loopback messages for now */
   if (owl_message_is_type_loopback(m)) {
     return(owl_function_typefilt("loopback"));
-  }
-
-  /* aim messages */
-  if (owl_message_is_type_aim(m)) {
-    if (owl_message_is_direction_in(m)) {
-      filtname=owl_function_aimuserfilt(owl_message_get_sender(m));
-    } else if (owl_message_is_direction_out(m)) {
-      filtname=owl_function_aimuserfilt(owl_message_get_recipient(m));
-    }
-    return(filtname);
   }
 
   /* narrow personal and login messages to the sender or recip as appropriate */
@@ -2994,14 +2776,11 @@ char *owl_function_ztext_stylestrip(const char *zt)
 }
 
 /* Popup a buddylisting.  If filename is NULL use the default .anyone */
-void owl_function_buddylist(int aim, int zephyr, const char *filename)
+void owl_function_buddylist(int zephyr, const char *filename)
 {
-  int i, j, idle;
+  int i, j;
   int interrupted = 0;
   owl_fmtext fm;
-  const owl_buddylist *bl;
-  const owl_buddy *b;
-  char *timestr;
 #ifdef HAVE_LIBZEPHYR
   int x;
   owl_list anyone;
@@ -3012,26 +2791,6 @@ void owl_function_buddylist(int aim, int zephyr, const char *filename)
 #endif
 
   owl_fmtext_init_null(&fm);
-
-  /* AIM first */
-  if (aim && owl_global_is_aimloggedin(&g)) {
-    bl=owl_global_get_buddylist(&g);
-
-    owl_fmtext_append_bold(&fm, "AIM users logged in:\n");
-    /* we're assuming AIM for now */
-    j=owl_buddylist_get_size(bl);
-    for (i=0; i<j; i++) {
-      b=owl_buddylist_get_buddy_n(bl, i);
-      idle=owl_buddy_get_idle_time(b);
-      if (idle!=0) {
-	timestr=owl_util_minutes_to_timestr(idle);
-      } else {
-	timestr=owl_strdup("");
-      }
-      owl_fmtext_appendf_normal(&fm, "  %-20.20s %-12.12s\n", owl_buddy_get_name(b), timestr);
-      owl_free(timestr);
-    }
-  }
 
 #ifdef HAVE_LIBZEPHYR
   if (zephyr) {
@@ -3095,7 +2854,7 @@ void owl_function_buddylist(int aim, int zephyr, const char *filename)
   }
 #endif
 
-  if (aim && zephyr) {
+  if (zephyr) {
     if (owl_perlconfig_is_function("BarnOwl::Hooks::_get_blist")) {
       char * perlblist = owl_perlconfig_execute("BarnOwl::Hooks::_get_blist()");
       if (perlblist) {
@@ -3469,27 +3228,6 @@ void owl_function_zephyr_buddy_check(int notify)
 
   owl_list_free_all(&anyone, owl_free);
 #endif
-}
-
-void owl_function_aimsearch_results(const char *email, owl_list *namelist)
-{
-  owl_fmtext fm;
-  int i, j;
-
-  owl_fmtext_init_null(&fm);
-  owl_fmtext_append_normal(&fm, "AIM screennames associated with ");
-  owl_fmtext_append_normal(&fm, email);
-  owl_fmtext_append_normal(&fm, ":\n");
-
-  j=owl_list_get_size(namelist);
-  for (i=0; i<j; i++) {
-    owl_fmtext_append_normal(&fm, "  ");
-    owl_fmtext_append_normal(&fm, owl_list_get_element(namelist, i));
-    owl_fmtext_append_normal(&fm, "\n");
-  }
-
-  owl_function_popless_fmtext(&fm);
-  owl_fmtext_free(&fm);
 }
 
 int owl_function_get_color_count(void)

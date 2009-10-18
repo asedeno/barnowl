@@ -116,16 +116,11 @@ dnl Checks for typedefs, structures, and compiler characteristics.
 AX_CFLAGS_WARN_ALL
 AX_CFLAGS_STRICT_PROTOTYPES
 
-AX_C_CHECK_FLAG([-Wno-pointer-sign],[],[],
-  [LIBFAIM_CFLAGS="$LIBFAIM_CFLAGS -Wno-pointer-sign"])
-
-AC_SUBST([LIBFAIM_CFLAGS])
-
 AC_SUBST(XSUBPPDIR)
 AC_SUBST(XSUBPPFLAGS)
 
 AC_PROG_INSTALL
 AC_PROG_RANLIB
 
-AC_CONFIG_FILES([Makefile libfaim/Makefile perl/Makefile perl/modules/Makefile])
+AC_CONFIG_FILES([Makefile perl/Makefile perl/modules/Makefile])
 AC_OUTPUT

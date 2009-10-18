@@ -2,7 +2,6 @@
 #ifdef HAVE_LIBZEPHYR
 #include <zephyr/zephyr.h>
 #endif
-#include <EXTERN.h>
 
 #define OWL_PERL
 #include "owl.h"

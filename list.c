@@ -1,5 +1,4 @@
 #include "owl.h"
-#include <stdlib.h>
 
 #define INITSIZE 10
 #define GROWBY 3 / 2

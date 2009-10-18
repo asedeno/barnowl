@@ -13,13 +13,19 @@
 #include <curses.h>
 #endif
 #include <sys/param.h>
+#include <sys/types.h>
+#include <ctype.h>
+#include <errno.h>
 #include <EXTERN.h>
+#include <fcntl.h>
 #include <netdb.h>
 #include <regex.h>
 #include <time.h>
 #include <signal.h>
+#include <stdlib.h>
+#include <string.h>
 #include <termios.h>
-#include "libfaim/aim.h"
+#include <unistd.h>
 #include <wchar.h>
 #include "config.h"
 #include "glib.h"
@@ -35,8 +41,6 @@
 typedef void WINDOW;
 /* logout is defined in FreeBSD. */
 #define logout logout_
-/* aim.h defines bool */
-#define HAS_BOOL
 #include <perl.h>
 #include "owl_perl.h"
 #undef logout
@@ -583,21 +587,10 @@ typedef struct _owl_global {
   pid_t newmsgproc_pid;
   int malloced, freed;
   owl_regex search_re;
-  aim_session_t aimsess;
-  aim_conn_t bosconn;
-  owl_timer aim_noop_timer;
-  owl_timer aim_ignorelogin_timer;
-  int aim_loggedin;         /* true if currently logged into AIM */
-  int aim_doprocessing;     /* true if we should process AIM events (like pending login) */
-  char *aim_screenname;     /* currently logged in AIM screen name */
-  char *aim_screenname_for_filters;     /* currently logged in AIM screen name */
-  owl_buddylist buddylist;  /* list of logged in AIM buddies */
-  owl_list messagequeue;    /* for queueing up aim and other messages */
+  owl_list messagequeue;    /* for queueing up messages */
   owl_dict styledict;       /* global dictionary of available styles */
   char *response;           /* response to the last question asked */
   int havezephyr;
-  int haveaim;
-  int ignoreaimlogin;
   int got_err_signal;	    /* 1 if we got an unexpected signal */
   siginfo_t err_signal_info;
   owl_zbuddylist zbuddies;
@@ -607,7 +600,6 @@ typedef struct _owl_global {
   owl_list io_dispatch_list;
   owl_list psa_list;
   GList *timerlist;
-  owl_timer *aim_nop_timer;
   int load_initial_subs;
   int interrupted;
 } owl_global;

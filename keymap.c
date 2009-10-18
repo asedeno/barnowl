@@ -1,4 +1,3 @@
-#include <string.h>
 #include "owl.h"
 
 /* returns 0 on success */
