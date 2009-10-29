@@ -1,4 +1,4 @@
-MODULES = Jabber IRC WordWrap
+MODULES = AIM Jabber IRC WordWrap
 
 EXTRA_DIST = $(MODULES:=/Makefile.PL) $(MODULES:=/inc) $(MODULES:=/lib)
 
