@@ -1,11 +1,6 @@
 #include "owl.h"
-#include <stdlib.h>
-#include <string.h>
-#include <unistd.h>
-#include <ctype.h>
 #include <pwd.h>
 #include <sys/stat.h>
-#include <sys/types.h>
 
 void sepbar(const char *in)
 {

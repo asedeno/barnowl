@@ -1,12 +1,6 @@
-#include <stdio.h>
-#include <unistd.h>
-#include <stdlib.h>
-#include <string.h>
-#include <netdb.h>
-#include <termios.h>
-#include <sys/ioctl.h>
-#include <time.h>
 #include "owl.h"
+#include <stdio.h>
+#include <sys/ioctl.h>
 
 #ifndef MAXHOSTNAMELEN
 #define MAXHOSTNAMELEN 256

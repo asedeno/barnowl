@@ -1,8 +1,5 @@
-#include <string.h>
-#include <pwd.h>
-#include <sys/types.h>
-#include <unistd.h>
 #include "owl.h"
+#include <pwd.h>
 
 int owl_zwrite_create_from_line(owl_zwrite *z, const char *line)
 {

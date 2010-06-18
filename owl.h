@@ -26,16 +26,23 @@
 #include <panel.h>
 #endif
 #include <sys/param.h>
+#include <sys/types.h>
+#include <ctype.h>
+#include <errno.h>
 #include <EXTERN.h>
+#include <fcntl.h>
 #include <netdb.h>
 #include <regex.h>
 #include <time.h>
 #include <signal.h>
+#include <stdlib.h>
+#include <string.h>
 #include <termios.h>
+#include <unistd.h>
 #include "libfaim/aim.h"
 #include <wchar.h>
 #include "config.h"
-#include "glib.h"
+#include <glib.h>
 #ifdef HAVE_LIBZEPHYR
 #include <zephyr/zephyr.h>
 #endif

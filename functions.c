@@ -1,16 +1,8 @@
+#include "owl.h"
 #include <stdio.h>
-#include <stdlib.h>
-#include <unistd.h>
-#include <signal.h>
 #include <netinet/in.h>
-#include <string.h>
-#include <time.h>
-#include <sys/types.h>
 #include <sys/stat.h>
 #include <sys/wait.h>
-#include <errno.h>
-#include <signal.h>
-#include "owl.h"
 #include "filterproc.h"
 
 char *owl_function_command(const char *cmdbuff)

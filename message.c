@@ -1,14 +1,9 @@
-#include <stdlib.h>
-#include <unistd.h>
-#include <string.h>
+#include "owl.h"
 #include <sys/socket.h>
 #include <netdb.h>
-#include <sys/types.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
-#include <time.h>
-#include "owl.h"
 #include "filterproc.h"
 
 static owl_fmtext_cache fmtext_cache[OWL_FMTEXT_CACHE_SIZE];

@@ -1,9 +1,5 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <unistd.h>
-#include <ctype.h>
 #include "owl.h"
+#include <stdio.h>
 
 #define OWLVAR_BOOL(name,default,summary,description) \
         { name, OWL_VARIABLE_BOOL, NULL, default, "on,off", summary,description, NULL, \
