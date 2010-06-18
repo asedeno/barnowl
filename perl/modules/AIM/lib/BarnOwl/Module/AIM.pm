@@ -26,7 +26,36 @@ our @oscars;
 sub queue_admin_msg {
     my $err = shift;
     BarnOwl::admin_message('AIM', $err);
+sub onStart {
+    register_owl_commands();
+    register_keybindings();
+    register_filters();
 }
+
+$BarnOwl::Hooks::startup->add("BarnOwl::Module::AIM::onStart");
+
+sub register_owl_commands() {
+    BarnOwl::new_command(aimlogin => \&cmd_aimlogin,
+                         {
+                             summary => "login to an AIM account",
+                             usage => "aimlogin <screenname> [<password>]"
+                         });
+    # TODO: aimlogout
+    BarnOwl::new_command(aimwrite => \&cmd_aimwrite,
+                         {
+                             summary => "send an AIM message",
+                             usage => "aimwrite <user> [-a screenname] [-m <message...>]"
+                         });
+}
+
+sub register_keybindings {
+    BarnOwl::bindkey(qw(recv a command start-command), 'aimwrite ');
+}
+
+sub register_filters {
+    BarnOwl::filter(qw(aim type ^aim$));
+}
+
 
 sub on_connection_changed {
     my ($oscar, $connection, $status) = @_;
@@ -130,9 +159,6 @@ sub cmd_aimwrite {
                                                          ));
                             });
 }
-
-BarnOwl::new_command(aimlogin => \&cmd_aimlogin, {});
-BarnOwl::new_command(aimwrite => \&cmd_aimwrite, {});
 
 ### helpers ###
 
