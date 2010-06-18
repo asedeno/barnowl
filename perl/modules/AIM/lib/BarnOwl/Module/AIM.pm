@@ -1,8 +1,7 @@
-use strict;;
+use strict;
 use warnings;
 
 package BarnOwl::Module::AIM;
-
 =head1 NAME
 
 BarnOwl::Module::AIM
@@ -18,6 +17,7 @@ use BarnOwl::Hooks;
 use BarnOwl::Message::AIM;
 
 use Net::OSCAR;
+use Net::OSCAR::Utility qw(normalize);
 
 no warnings 'redefine';
 
@@ -62,19 +62,19 @@ sub on_error {
 
 sub on_im_in {
     my ($oscar, $sender, $message, $is_away) = @_;
-    my $msg = BarnOwl::Message->new(
-            type => 'AIM',
-            direction => 'in',
-            sender => $sender,
-            origbody => $message,
-            away => $is_away,
-            body => zformat($message, $is_away),
-            recipient => get_screenname($oscar),
-            replycmd =>
-                "aimwrite -a '" . get_screenname($oscar) . "' $sender",
-            replysendercmd =>
-                "aimwrite -a '" . get_screenname($oscar) . "' $sender",
-            );
+    my $account = get_screenname($oscar);
+    $sender = squish($sender);
+    my $replycmd = "aimwrite -a " . $account . " " . $sender;
+    my $msg = BarnOwl::Message->new(type => 'AIM',
+                                    direction => 'in',
+                                    sender => $sender,
+                                    origbody => $message,
+                                    away => $is_away,
+                                    body => zformat($message, $is_away),
+                                    recipient => $account,
+                                    replycmd => $replycmd,
+                                    replysendercmd => $replycmd
+                                   );
     BarnOwl::queue_message($msg);
 }
 
@@ -111,25 +111,24 @@ sub cmd_aimlogin {
 
 sub cmd_aimwrite {
     my ($cmd, $recipient) = @_;
-    BarnOwl::start_edit_win(join(' ', @_), sub {
-            my ($body) = @_;
-            my $oscar = get_oscar();
-            my $sender = get_screenname($oscar);
-            $oscar->send_im($recipient, $body);
-            BarnOwl::queue_message(BarnOwl::Message->new(
-                    type => 'AIM',
-                    direction => 'in',
-                    sender => $sender,
-                    origbody => $body,
-                    away => 0,
-                    body => zformat($body, 0),
-                    recipient => $recipient,
-                    replycmd =>
-                        "aimwrite -a $sender $recipient",
-                    replysendercmd =>
-                        "aimwrite -a $sender $recipient",
-            ));
-    });
+    $recipient = squish($recipient);
+    BarnOwl::start_edit_win(join(' ', @_),
+                            sub { my ($body) = @_;
+                                  my $oscar = get_oscar();
+                                  my $sender = get_screenname($oscar);
+                                  my $replycmd = "aimwrite -a $sender $recipient";
+                                  $oscar->send_im($recipient, $body);
+                                  BarnOwl::queue_message(BarnOwl::Message->new(type => 'AIM',
+                                                                               direction => 'in',
+                                                                               sender => $sender,
+                                                                               origbody => $body,
+                                                                               away => 0,
+                                                                               body => zformat($body, 0),
+                                                                               recipient => $recipient,
+                                                                               replycmd => $replycmd,
+                                                                               replysendercmd => $replycmd
+                                                         ));
+                            });
 }
 
 BarnOwl::new_command(aimlogin => \&cmd_aimlogin, {});
@@ -163,9 +162,15 @@ sub get_oscar() {
     die('You must specify an account with -a');
 }
 
+sub squish($) {
+    my $s = shift;
+    $s =~ s/\s+//g;
+    return $s;
+}
+
 sub get_screenname($) {
 # TODO qualify realm
-    return shift->screenname;
+    return squish(shift->screenname);
 }
 
 1;
