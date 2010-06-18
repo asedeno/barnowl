@@ -23,9 +23,6 @@ no warnings 'redefine';
 
 our @oscars;
 
-sub queue_admin_msg {
-    my $err = shift;
-    BarnOwl::admin_message('AIM', $err);
 sub onStart {
     register_owl_commands();
     register_keybindings();
@@ -161,6 +158,11 @@ sub cmd_aimwrite {
 }
 
 ### helpers ###
+
+sub queue_admin_msg {
+    my $err = shift;
+    BarnOwl::admin_message('AIM', $err);
+}
 
 sub zformat($$) {
     # TODO subclass HTML::Parser
