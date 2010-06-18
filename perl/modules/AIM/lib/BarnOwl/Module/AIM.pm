@@ -15,6 +15,7 @@ BarnOwl module implementing AIM support via Net::OSCAR
 
 use BarnOwl;
 use BarnOwl::Hooks;
+use BarnOwl::Message::AIM;
 
 use Net::OSCAR;
 
