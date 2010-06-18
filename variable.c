@@ -139,7 +139,7 @@ static owl_variable variables_to_init[] = {
   OWLVAR_BOOL( "ignorelogins" /* %OwlVarStub */, 0,
 	       "Enable printing of login notifications",
 	       "When this is enabled, Owl will print login and logout notifications\n"
-	       "for AIM, zephyr, or other protocols.  If disabled Owl will not print\n"
+	       "for all supported protocols.  If disabled Owl will not print\n"
 	       "login or logout notifications.\n"),
 
   OWLVAR_STRING( "logfilter" /* %OwlVarStub */, "",
@@ -154,7 +154,7 @@ static owl_variable variables_to_init[] = {
   OWLVAR_BOOL( "loglogins" /* %OwlVarStub */, 0,
 	       "Enable logging of login notifications",
 	       "When this is enabled, Owl will login login and logout notifications\n"
-	       "for AIM, zephyr, or other protocols.  If disabled Owl will not print\n"
+	       "for all protocols that support it.  If disabled Owl will not print\n"
 	       "login or logout notifications.\n"),
 
   OWLVAR_ENUM_FULL( "disable-ctrl-d" /* %OwlVarStub:lockout_ctrld */, 1,
@@ -234,19 +234,6 @@ static owl_variable variables_to_init[] = {
 		 OWL_DEFAULT_ZAWAYMSG,
 	         "default zaway message", "" ),
 
-  OWLVAR_BOOL_FULL( "aaway" /* %OwlVarStub */, 0,
-		    "Set AIM away status",
-		    "",
-		    NULL, owl_variable_aaway_set, NULL),
-
-  OWLVAR_STRING( "aaway_msg" /* %OwlVarStub */, 
-		 OWL_DEFAULT_AAWAYMSG,
-	         "AIM away msg for responding when away", "" ),
-
-  OWLVAR_STRING( "aaway_msg_default" /* %OwlVarStub */, 
-		 OWL_DEFAULT_AAWAYMSG,
-	         "default AIM away message", "" ),
-
   OWLVAR_STRING( "view_home" /* %OwlVarStub */, "all",
 	         "home view to switch to after 'X' and 'V'", 
 		 "SEE ALSO: view, filter\n" ),
@@ -289,14 +276,6 @@ static owl_variable variables_to_init[] = {
                  "As a courtesy to recipients, it is recommended that outgoing\n"
                  "Zephyr messages be no wider than 70 columns.\n"),
 
-  OWLVAR_INT( "aim_ignorelogin_timer" /* %OwlVarStub */, 15,
-	      "number of seconds after AIM login to ignore login messages",
-	      "This specifies the number of seconds to wait after an\n"
-	      "AIM login before allowing the receipt of AIM login notifications.\n"
-	      "By default this is set to 15.  If you would like to view login\n"
-	      "notifications of buddies as soon as you login, set it to 0 instead."),
-
-	      
   OWLVAR_INT_FULL( "typewinsize" /* %OwlVarStub:typwin_lines */, 
 		   OWL_TYPWIN_SIZE,
 		  "number of lines in the typing window", 
@@ -404,19 +383,6 @@ int owl_variable_debug_set(owl_variable *v, const void *newval)
 {
   if (newval && (*(const int*)newval == 1 || *(const int*)newval == 0)) {
     g.debug = *(const int*)newval;
-  }
-  return owl_variable_bool_set_default(v, newval);
-}
-
-/* When 'aaway' is changed, need to notify the AIM server */
-int owl_variable_aaway_set(owl_variable *v, const void *newval)
-{
-  if (newval) {
-    if (*(const int*)newval == 1) {
-      owl_aim_set_awaymsg(owl_global_get_aaway_msg(&g));
-    } else if (*(const int*)newval == 0) {
-      owl_aim_set_awaymsg("");
-    }
   }
   return owl_variable_bool_set_default(v, newval);
 }

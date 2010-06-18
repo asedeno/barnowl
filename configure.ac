@@ -123,14 +123,9 @@ dnl Checks for typedefs, structures, and compiler characteristics.
 AX_CFLAGS_WARN_ALL
 AX_CFLAGS_STRICT_PROTOTYPES
 
-AX_C_CHECK_FLAG([-Wno-pointer-sign],[],[],
-  [LIBFAIM_CFLAGS="$LIBFAIM_CFLAGS -Wno-pointer-sign"])
-
 AM_CONDITIONAL([ENABLE_ZCRYPT], [test "$HAVE_DES_STRING_TO_KEY" && dnl
                                  test "$HAVE_DES_KEY_SCHED" && dnl
                                  test "$HAVE_DES_ECB_ENCRYPT"])
-
-AC_SUBST([LIBFAIM_CFLAGS])
 
 AC_SUBST(XSUBPPDIR)
 AC_SUBST(XSUBPPFLAGS)
@@ -142,5 +137,5 @@ if test "x${HAVE_ZIP}" = "xno"; then
    AC_MSG_ERROR([cannot find a 'zip' binary.])
 fi
 
-AC_CONFIG_FILES([Makefile libfaim/Makefile perl/Makefile perl/modules/Makefile])
+AC_CONFIG_FILES([Makefile perl/Makefile perl/modules/Makefile])
 AC_OUTPUT

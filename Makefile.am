@@ -18,19 +18,14 @@ barnowl_bin_SOURCES = $(BASE_SRCS) \
      owl.c \
      $(GEN_C) $(GEN_H)
 
-barnowl_bin_LDADD = libfaim/libfaim.a
-
 tester_bin_SOURCES = $(BASE_SRCS) \
      owl.h owl_perl.h config.h \
      $(GEN_C) $(GEN_H) \
      tester.c
 
-tester_bin_LDADD = libfaim/libfaim.a
-
 TESTS=runtests.sh
 
 CPPFLAGS = -I$(top_srcdir)/ \
-           -I$(top_srcdir)/libfaim/ \
            -DDATADIR='"$(pkgdatadir)"' \
            -DBINDIR='"$(bindir)"' \
            $(GIT_FLAGS)
@@ -40,7 +35,7 @@ BASE_SRCS=list.c message.c mainwin.c popwin.c zephyr.c messagelist.c \
      perlconfig.c keys.c functions.c zwrite.c viewwin.c help.c filter.c \
      regex.c history.c view.c dict.c variable.c filterelement.c pair.c \
      keypress.c keymap.c keybinding.c cmd.c context.c \
-     aim.c buddy.c buddylist.c style.c errqueue.c \
+     style.c errqueue.c \
      zbuddylist.c popexec.c select.c wcwidth.c \
      glib_compat.c filterproc.c
 
@@ -80,4 +75,4 @@ install-exec-hook:
 	mv -f $(DESTDIR)$(bindir)/$(call do_transform,barnowl.bin) \
 	      $(DESTDIR)$(bindir)/$(call do_transform,barnowl)
 
-SUBDIRS = libfaim perl
+SUBDIRS = perl

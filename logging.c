@@ -150,11 +150,8 @@ void owl_log_outgoing(const owl_message *m)
     to = owl_sprintf("jabber:%s", owl_message_get_recipient(m));
     owl_text_tr(to, '/', '_');
   } else if (owl_message_is_type_aim(m)) {
-    char *temp2;
-    temp = owl_aim_normalize_screenname(owl_message_get_recipient(m));
-    temp2 = g_utf8_strdown(temp,-1);
-    to = owl_sprintf("aim:%s", temp2);
-    owl_free(temp2);
+    temp = g_utf8_strdown(owl_message_get_recipient(m),-1);
+    to = owl_sprintf("aim:%s", temp);
     owl_free(temp);
   } else {
     to = owl_sprintf("loopback");
@@ -265,7 +262,7 @@ void owl_log_incoming(const owl_message *m)
   } else if (owl_message_is_type_aim(m)) {
     /* we do not yet handle chat rooms */
     char *normalto, *temp;
-    temp = owl_aim_normalize_screenname(owl_message_get_sender(m));
+    temp = owl_strdup(owl_message_get_sender(m));
     normalto = g_utf8_strdown(temp, -1);
     from=frombuff=owl_sprintf("aim:%s", normalto);
     owl_free(normalto);

@@ -39,7 +39,6 @@
 #include <string.h>
 #include <termios.h>
 #include <unistd.h>
-#include "libfaim/aim.h"
 #include <wchar.h>
 #include "config.h"
 #include <glib.h>
@@ -602,21 +601,10 @@ typedef struct _owl_global {
   owl_colorpair_mgr cpmgr;
   pid_t newmsgproc_pid;
   owl_regex search_re;
-  aim_session_t aimsess;
-  aim_conn_t bosconn;
-  owl_timer aim_noop_timer;
-  owl_timer aim_ignorelogin_timer;
-  int aim_loggedin;         /* true if currently logged into AIM */
-  int aim_doprocessing;     /* true if we should process AIM events (like pending login) */
-  char *aim_screenname;     /* currently logged in AIM screen name */
-  char *aim_screenname_for_filters;     /* currently logged in AIM screen name */
-  owl_buddylist buddylist;  /* list of logged in AIM buddies */
   GQueue *messagequeue;     /* for queueing up aim and other messages */
   owl_dict styledict;       /* global dictionary of available styles */
   char *response;           /* response to the last question asked */
   int havezephyr;
-  int haveaim;
-  int ignoreaimlogin;
   volatile sig_atomic_t got_err_signal; /* 1 if we got an unexpected signal */
   volatile siginfo_t err_signal_info;
   owl_zbuddylist zbuddies;
@@ -627,7 +615,6 @@ typedef struct _owl_global {
   owl_list io_dispatch_list;
   owl_list psa_list;
   GList *timerlist;
-  owl_timer *aim_nop_timer;
   int load_initial_subs;
   volatile sig_atomic_t interrupted;
 } owl_global;
