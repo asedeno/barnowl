@@ -137,10 +137,19 @@ int owl_zwrite_create_from_line(owl_zwrite *z, const char *line)
   }
 
   /* now deal with defaults */
-  if (z->class==NULL) z->class=owl_strdup(OWL_ZEPHYR_DEFAULT_CLASS);
-  if (z->inst==NULL) z->inst=owl_strdup(OWL_ZEPHYR_DEFAULT_INST);
+  if (z->class==NULL) {
+    const char *class = owl_zephyr_get_variable("zwrite-class");
+    z->class=owl_strdup(class?class:OWL_ZEPHYR_DEFAULT_CLASS);
+  }
+  if (z->inst==NULL) {
+    const char *inst = owl_zephyr_get_variable("zwrite-inst");
+    z->inst=owl_strdup(inst?inst:OWL_ZEPHYR_DEFAULT_INST);
+  }
   if (z->realm==NULL) z->realm=owl_strdup("");
-  if (z->opcode==NULL) z->opcode=owl_strdup(OWL_ZEPHYR_DEFAULT_OPCODE);
+  if (z->opcode==NULL) {
+    const char *opcode = owl_zephyr_get_variable("zwrite-opcode");
+    z->opcode=owl_strdup(opcode?opcode:OWL_ZEPHYR_DEFAULT_OPCODE);
+  }
   /* z->message is allowed to stay NULL */
 
   if(msg) {

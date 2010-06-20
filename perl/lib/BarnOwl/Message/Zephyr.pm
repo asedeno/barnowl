@@ -86,11 +86,13 @@ sub context_reply_cmd {
     my $mclass = shift;
     my $minstance = shift;
     my @class;
-    if (lc($mclass) ne OWL_ZEPHYR_DEFAULT_CLASS)) {
+    my $defclass = BarnOwl::get_zephyr_variable('zwrite-class');
+    if (lc($mclass) ne (defined $defclass ? $defclass : OWL_ZEPHYR_DEFAULT_CLASS)) {
         @class = ('-c', $mclass);
     }
     my @instance;
-    if (lc($minstance) ne OWL_ZEPHYR_DEFAULT_INST)) {
+    my $definst = BarnOwl::get_zephyr_variable('zwrite-inst');
+    if (lc($minstance) ne (defined $definst ? $definst : OWL_ZEPHYR_DEFAULT_INST)) {
         @instance = ('-i', $minstance);
     }
     return (@class, @instance);
