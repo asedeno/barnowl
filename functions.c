@@ -2596,7 +2596,7 @@ char *owl_function_smartfilter(int type, int invert_related)
     }
 
     /* narrow class MESSAGE, instance foo, recip * messages to class, inst */
-    if (!strcasecmp(owl_message_get_class(m), "message")) {
+    if (!strcasecmp(owl_message_get_class(m), OWL_ZEPHYR_DEFAULT_CLASS)) {
       filtname=owl_function_classinstfilt(owl_message_get_class(m), owl_message_get_instance(m), related);
       return(filtname);
     }
@@ -2644,7 +2644,8 @@ void owl_function_smartzpunt(int type)
   mclass = owl_message_get_class(m);
   minst = owl_message_get_instance(m);
   if (!mclass || !*mclass || *mclass==' '
-      || (!strcasecmp(mclass, "message") && !strcasecmp(minst, "personal"))
+      || (!strcasecmp(mclass, OWL_ZEPHYR_DEFAULT_CLASS)
+          && !strcasecmp(minst, OWL_ZEPHYR_DEFAULT_INST))
       || (type && (!minst || !*minst|| *minst==' '))) {
     owl_function_error("smartzpunt can't safely do this for <%s,%s>",
 			 mclass, minst);

@@ -3,6 +3,9 @@ use warnings;
 
 package BarnOwl::Message::Zephyr;
 
+use constant OWL_ZEPHYR_DEFAULT_CLASS  => "message";
+use constant OWL_ZEPHYR_DEFAULT_INST   => "personal";
+
 use constant WEBZEPHYR_PRINCIPAL => "daemon.webzephyr";
 use constant WEBZEPHYR_CLASS     => "webzephyr";
 use constant WEBZEPHYR_OPCODE    => "webzephyr";
@@ -59,7 +62,7 @@ sub is_ping     { return (lc(shift->opcode) eq "ping"); }
 
 sub is_personal {
     my ($m) = @_;
-    return ((lc($m->class) eq "message")
+    return ((lc($m->class) eq OWL_ZEPHYR_DEFAULT_CLASS)
 	    && $m->is_private);
 }
 
@@ -83,11 +86,11 @@ sub context_reply_cmd {
     my $mclass = shift;
     my $minstance = shift;
     my @class;
-    if (lc($mclass) ne "message") {
+    if (lc($mclass) ne OWL_ZEPHYR_DEFAULT_CLASS)) {
         @class = ('-c', $mclass);
     }
     my @instance;
-    if (lc($minstance) ne "personal") {
+    if (lc($minstance) ne OWL_ZEPHYR_DEFAULT_INST)) {
         @instance = ('-i', $minstance);
     }
     return (@class, @instance);

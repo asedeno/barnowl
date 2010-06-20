@@ -332,7 +332,7 @@ int owl_zephyr_loadbarnowldefaultsubs(void)
   ZResetAuthentication();
   count=0;
 
-  subs[count].zsub_class=owl_strdup("message");
+  subs[count].zsub_class=owl_strdup(OWL_ZEPHYR_DEFAULT_CLASS);
   subs[count].zsub_classinst=owl_strdup("*");
   subs[count].zsub_recipient=owl_strdup("%me%");
   count++;
@@ -745,10 +745,10 @@ void owl_zephyr_handle_ack(const ZNotice_t *retnotice)
       if (strcasecmp(retnotice->z_recipient, ""))
       { /* personal */
         tmp=short_zuser(retnotice->z_recipient);
-        if(!strcasecmp(retnotice->z_class, "message") &&
-           !strcasecmp(retnotice->z_class_inst, "personal")) {
+        if(!strcasecmp(retnotice->z_class, OWL_ZEPHYR_DEFAULT_CLASS) &&
+           !strcasecmp(retnotice->z_class_inst, OWL_ZEPHYR_DEFAULT_INST)) {
           owl_function_makemsg("Message sent to %s.", tmp);
-        } else if(!strcasecmp(retnotice->z_class, "message")) { /* instanced, but not classed, personal */
+        } else if(!strcasecmp(retnotice->z_class, OWL_ZEPHYR_DEFAULT_CLASS)) { /* instanced, but not classed, personal */
           owl_function_makemsg("Message sent to %s on -i %s\n", tmp, retnotice->z_class_inst);
         } else { /* classed personal */
           owl_function_makemsg("Message sent to %s on -c %s -i %s\n", tmp, retnotice->z_class, retnotice->z_class_inst);
@@ -780,14 +780,14 @@ void owl_zephyr_handle_ack(const ZNotice_t *retnotice)
        * see the whole thing can scroll to the side, and for those with wide
        * terminals or who don't care, not splitting saves a line in the UI
        */
-      if(strcasecmp(retnotice->z_class, "message")) {
+      if(strcasecmp(retnotice->z_class, OWL_ZEPHYR_DEFAULT_CLASS)) {
         snprintf(buff, BUFFLEN,
                  "Could not send message to %s: "
                  "not logged in or subscribing to class %s, instance %s.\n",
                  tmp,
                  retnotice->z_class,
                  retnotice->z_class_inst);
-      } else if(strcasecmp(retnotice->z_class_inst, "personal")) {
+      } else if(strcasecmp(retnotice->z_class_inst, OWL_ZEPHYR_DEFAULT_INST)) {
         snprintf(buff, BUFFLEN,
                  "Could not send message to %s: "
                  "not logged in or subscribing to instance %s.\n",
@@ -855,7 +855,7 @@ void owl_zephyr_zaway(const owl_message *m)
   /* bail if it doesn't look like a message we should reply to.  Some
    * of this defined by the way zaway(1) works
    */
-  if (strcasecmp(owl_message_get_class(m), "message")) return;
+  if (strcasecmp(owl_message_get_class(m), OWL_ZEPHYR_DEFAULT_CLASS)) return;
   if (strcasecmp(owl_message_get_recipient(m), ZGetSender())) return;
   if (!strcasecmp(owl_message_get_sender(m), "")) return;
   if (!strcasecmp(owl_message_get_opcode(m), "ping")) return;

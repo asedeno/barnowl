@@ -200,6 +200,10 @@ typedef void HV;
 
 #define OWL_CMD_ALIAS_SUMMARY_PREFIX "command alias to: "
 
+#define OWL_ZEPHYR_DEFAULT_CLASS  "message"
+#define OWL_ZEPHYR_DEFAULT_INST   "personal"
+#define OWL_ZEPHYR_DEFAULT_OPCODE ""
+
 #define OWL_WEBZEPHYR_PRINCIPAL "daemon.webzephyr"
 #define OWL_WEBZEPHYR_CLASS     "webzephyr"
 #define OWL_WEBZEPHYR_OPCODE    "webzephyr"

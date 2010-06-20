@@ -137,10 +137,10 @@ int owl_zwrite_create_from_line(owl_zwrite *z, const char *line)
   }
 
   /* now deal with defaults */
-  if (z->class==NULL) z->class=owl_strdup("message");
-  if (z->inst==NULL) z->inst=owl_strdup("personal");
+  if (z->class==NULL) z->class=owl_strdup(OWL_ZEPHYR_DEFAULT_CLASS);
+  if (z->inst==NULL) z->inst=owl_strdup(OWL_ZEPHYR_DEFAULT_INST);
   if (z->realm==NULL) z->realm=owl_strdup("");
-  if (z->opcode==NULL) z->opcode=owl_strdup("");
+  if (z->opcode==NULL) z->opcode=owl_strdup(OWL_ZEPHYR_DEFAULT_OPCODE);
   /* z->message is allowed to stay NULL */
 
   if(msg) {
@@ -167,7 +167,7 @@ void owl_zwrite_send_ping(const owl_zwrite *z)
 
   if (z->noping) return;
   
-  if (strcasecmp(z->class, "message")) {
+  if (strcasecmp(z->class, OWL_ZEPHYR_DEFAULT_CLASS)) {
     return;
   }
 

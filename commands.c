@@ -2413,7 +2413,7 @@ void owl_command_zpunt_and_zunpunt(int argc, const char *const *argv, int type)
    */
   const char *class, *inst, *recip;
 
-  class="message";
+  class=OWL_ZEPHYR_DEFAULT_CLASS;
   inst="";
   recip="*";
 
