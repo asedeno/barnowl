@@ -990,6 +990,76 @@ void owl_function_calculate_topmsg(int direction)
   }
 }
 
+/* Update `topmsg' to indicate the new topmsg.
+ * m - percent from `curmsg' to center at which reframing occurs.
+ *     100% is at top or bottom.
+ * n - percent from top to place `curmsg' when reframing.
+ */
+void owl_function_calculate_topmsg_generic(int direction,  owl_view_iterator *curmsg, owl_view_iterator *topmsg, int recwinlines, int m, int n, bool direction_agnostic)
+{
+  bool reframe = false;
+  int lines, half, target;
+  owl_view_iterator *it;
+  it = owl_view_iterator_delete_later(owl_view_iterator_new());
+
+  /* Sanity check */
+  if (m < 0) m = 0;
+  else if (m > 100) m = 100;
+  if (n < 0) n = 0;
+  else if (n > 100) n = 100;
+
+  if (m == 0 || /* always reframe */
+      owl_view_iterator_cmp(curmsg, topmsg) < 0 /* Off the top of the screen */
+      ) {
+    reframe = true;
+  } else {
+    /* Find number of lines from top to bottom of curmsg (store in lines) */
+    lines = 0;
+    for (owl_view_iterator_clone(it, topmsg);
+         owl_view_iterator_cmp(it, curmsg) <= 0
+           /* If we ever find we're off-screen, we can stop */
+           && lines <= recwinlines
+           && !owl_view_iterator_is_at_end(it);
+         owl_view_iterator_next(it)) {
+      lines += owl_message_get_numlines(owl_view_iterator_get_message(it));
+    }
+
+    half = recwinlines/2;
+    if (lines > half*(1+(m/100.0)) ||
+        lines < half*(1-(m/100.0))){
+      reframe = true;
+    }
+  }
+
+  if (reframe) {
+    if (!direction_agnostic && direction == OWL_DIRECTION_UPWARDS) {
+      target = recwinlines*(1-(n/100.0));
+    } else {
+      target = recwinlines*(n/100.0);
+    }
+    if (target == 0) {
+      owl_view_iterator_clone(topmsg, curmsg);
+    } else {
+      owl_view_iterator_clone(it, curmsg);
+      lines = owl_message_get_numlines(owl_view_iterator_get_message(it));
+      for(owl_view_iterator_prev(it);
+          !owl_view_iterator_is_at_start(it);
+          owl_view_iterator_prev(it)) {
+        lines += owl_message_get_numlines(owl_view_iterator_get_message(it));
+        if (lines > target) {
+          owl_view_iterator_next(it);
+          break;
+        }
+      }
+      if (owl_view_iterator_is_at_start(it)) {
+        lines += owl_message_get_numlines(owl_view_iterator_get_message(it));
+        if (lines > target) owl_view_iterator_next(it);
+      }
+      owl_view_iterator_clone(topmsg, it);
+    }
+  }
+}
+
 /* Updates `topmsg' to indicate the new topmsg
  * Passed the last direction of movement, 
  * the current view,
